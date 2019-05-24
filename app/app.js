@@ -27,13 +27,13 @@ function saveStory(e) {
     status: storyStatus
   }
 
-  if(localStorage.getItem('stories') == null) {
+  if (storyIndex === -1) {
     var stories = [];
-    stories.push(story);
-    localStorage.setItem('stories', JSON.stringify(stories));
+      stories.push(story);
+      localStorage.setItem('stories', JSON.stringify(stories));
   } else {
     var stories = JSON.parse(localStorage.getItem('stories'));
-    stories.push(story);
+    stories.splice(storyIndex, 1, story);
     localStorage.setItem('stories', JSON.stringify(stories));
   }
 
@@ -58,6 +58,29 @@ function setStatusRead(id){
   fetchStories();
 }
 
+var storyIndex = -1;
+
+function updateStory(id){
+
+  var stories = JSON.parse(localStorage.getItem('stories'));
+  var storyBoard = document.getElementById('storyBoard');
+
+  for (var i = 0; i < stories.length; i++) {
+    if(stories[i].id === id) {
+      storyIndex = i;
+      document.getElementById('storyDescInput').value = stories[i].description;;
+      document.getElementById('storyGenreInput').value = stories[i].genre;;
+      document.getElementById('storyAuthorInput').value = stories[i].author;
+      document.getElementById('submit').innerHTML = "Update";
+      stories[i].status = 'un-seen';
+
+    }
+  }
+  localStorage.setItem('stories', JSON.stringify(stories));
+
+  fetchStories();
+}
+
 function removeStory(id) {
   var stories = JSON.parse(localStorage.getItem('stories'));
 
@@ -67,7 +90,7 @@ function removeStory(id) {
     }
   }
 
-  localStorage.setItem('stories', JSON.stringify(stories));
+ localStorage.setItem('stories', JSON.stringify(stories));
 
   fetchStories();
 }
@@ -88,11 +111,12 @@ function fetchStories() {
     storyBoard.innerHTML += '<div class="well">'+
                             '<h6>LSEN: ' + id + '</h6>'+ //LSEN stands for LocalStorageEditionNumber
                             '<p><span class="label label-info">' + status + '</span></p>'+
-                             '<h3>' + desc + '</h3>'+
+                             '<h3 class="text-justify">' + desc + '</h3>'+
                              '<p><span class="glyphicon glyphicon-time"></span>' + genre + '</p>'+
                              '<p><span class="glyphicon glyphicon-user"></span>' + author + '</p>'+
-                             '<a href="#" onclick="setStatusRead(\''+id+'\')" class="btn btn-warning">Read</a>'+
-                             '<a href="#" onclick="removeStory(\''+id+'\')" class="btn btn-danger">Remove</a>'+
+                             '<a href="#" onclick="setStatusRead(\''+id+'\')" class="btn btn-success" role="button">Read</a>'+
+                             '<a href="#" onclick="updateStory(\''+id+'\')" class="btn btn-info" role="button">Edit</a>'+
+                             '<a href="#" onclick="removeStory(\''+id+'\')" class="btn btn-danger" role="button">Remove</a>'+
                              '</div>'
 
   }
